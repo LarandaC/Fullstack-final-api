@@ -5,10 +5,12 @@ import { AppError } from "../errors/AppError";
 export class ProductController {
   constructor(private readonly productService: IProductService) {}
 
-  getAll = async (_req: Request, res: Response): Promise<void> => {
+  getAll = async (req: Request, res: Response): Promise<void> => {
     try {
-      const products = await this.productService.getAll();
-      res.json(products);
+      const page = Math.max(1, parseInt(req.query.page as string) || 1);
+      const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 10));
+      const result = await this.productService.getPaginated(page, limit);
+      res.json(result);
     } catch {
       res.status(500).json({ message: "Error al obtener productos" });
     }

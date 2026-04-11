@@ -1,7 +1,8 @@
 import { IProduct } from "../../models/Product";
-import { CreateProductData } from "../repositories/IProductRepository";
+import { CreateProductData, PaginatedResult } from "../repositories/IProductRepository";
 
 export interface IProductService {
+  getPaginated(page: number, limit: number): Promise<PaginatedResult<IProduct>>;
   getAll(): Promise<IProduct[]>;
   getById(id: string): Promise<IProduct>;
   create(data: CreateProductData): Promise<IProduct>;

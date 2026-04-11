@@ -24,7 +24,7 @@ export class MovementService implements IMovementService {
       throw new AppError("Producto no encontrado", 404);
     }
 
-    if (data.type === "salida" && product.stock < data.quantity) {
+    if (data.type === "salida" && product.minStock < data.quantity) {
       throw new AppError("Stock insuficiente", 400);
     }
 
