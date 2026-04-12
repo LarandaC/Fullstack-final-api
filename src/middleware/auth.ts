@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import type { UserRole } from "../types/roles";
 
 export interface AuthRequest extends Request {
   user?: {
@@ -32,14 +33,20 @@ export const protect = (
   }
 };
 
-export const adminOnly = (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction,
-): void => {
-  if (req.user?.role !== "admin") {
-    res.status(403).json({ message: "Acceso denegado, solo administradores" });
-    return;
-  }
-  next();
-};
+/**
+ * Middleware factory para control de acceso basado en roles.
+ * Acepta uno o más roles permitidos.
+ *
+ * @example
+ * router.delete("/:id", protect, requireRole(ROLES.ADMIN), controller.delete)
+ * router.put("/:id", protect, requireRole(ROLES.ADMIN, ROLES.SUPERVISOR), controller.update)
+ */
+export const requireRole =
+  (...roles: UserRole[]) =>
+  (req: AuthRequest, res: Response, next: NextFunction): void => {
+    if (!req.user || !roles.includes(req.user.role as UserRole)) {
+      res.status(403).json({ message: "Acceso denegado: rol insuficiente" });
+      return;
+    }
+    next();
+  };

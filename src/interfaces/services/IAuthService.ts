@@ -1,8 +1,10 @@
+import type { UserRole } from "../../types/roles";
+
 export interface RegisterInput {
   name: string;
   email: string;
   password: string;
-  role?: "admin" | "operario";
+  role?: UserRole;
 }
 
 export interface LoginInput {

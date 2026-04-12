@@ -1,10 +1,11 @@
 import { IUser } from "../../models/User";
+import type { UserRole } from "../../types/roles";
 
 export interface CreateUserData {
   name: string;
   email: string;
   password: string;
-  role?: "admin" | "operario";
+  role?: UserRole;
 }
 
 export interface IUserRepository {

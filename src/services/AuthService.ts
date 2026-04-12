@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { IAuthService, RegisterInput, LoginInput, RegisterResult, LoginResult } from "../interfaces/services/IAuthService";
 import { IUserRepository } from "../interfaces/repositories/IUserRepository";
 import { AppError } from "../errors/AppError";
+import { ROLES } from "../types/roles";
 
 export class AuthService implements IAuthService {
   constructor(private readonly userRepository: IUserRepository) {}
@@ -18,7 +19,7 @@ export class AuthService implements IAuthService {
       name: data.name,
       email: data.email,
       password: hashedPassword,
-      role: data.role ?? "operario",
+      role: data.role ?? ROLES.INVENTARISTA,
     });
 
     return {
