@@ -1,16 +1,29 @@
-import { IMovement } from "../../models/Movement";
+import type { IMovement } from "../../models/Movement";
+import type { CreateCompraItemData, CreateBajaItemData } from "../repositories/IMovementRepository";
 
-export interface CreateMovementInput {
-  type: "entrada" | "salida";
-  quantity: number;
-  product: string;
+// ─── DTOs de entrada (lo que recibe el controller) ────────────────────────────
+
+export interface CreateCompraInput {
+  items: CreateCompraItemData[];
+  notes?: string;
   supplier?: string;
-  reason?: string;
   date?: Date;
 }
 
+export interface CreateBajaInput {
+  items: CreateBajaItemData[];
+  notes?: string;
+  date?: Date;
+}
+
+// ─── Interfaz ──────────────────────────────────────────────────────────────────
+
 export interface IMovementService {
   getAll(): Promise<IMovement[]>;
+  getById(id: string): Promise<IMovement>;
   getByProduct(productId: string): Promise<IMovement[]>;
-  create(data: CreateMovementInput, userId: string): Promise<IMovement>;
+  createCompra(data: CreateCompraInput, userId: string): Promise<IMovement>;
+  createBaja(data: CreateBajaInput, userId: string): Promise<IMovement>;
+  approveBaja(id: string, approverId: string): Promise<IMovement>;
+  rejectBaja(id: string, approverId: string): Promise<IMovement>;
 }

@@ -1,39 +1,82 @@
-import { Response } from "express";
-import { AuthRequest } from "../middleware/auth";
-import { IMovementService } from "../interfaces/services/IMovementService";
-import { AppError } from "../errors/AppError";
+import { Response, NextFunction } from "express";
+import type { AuthRequest } from "../middleware/auth";
+import type { IMovementService } from "../interfaces/services/IMovementService";
 
 export class MovementController {
   constructor(private readonly movementService: IMovementService) {}
 
-  getAll = async (_req: AuthRequest, res: Response): Promise<void> => {
+  // ─── Consultas ───────────────────────────────────────────────────────────────
+
+  getAll = async (_req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const movements = await this.movementService.getAll();
       res.json(movements);
-    } catch {
-      res.status(500).json({ message: "Error al obtener movimientos" });
-    }
-  };
-
-  create = async (req: AuthRequest, res: Response): Promise<void> => {
-    try {
-      const movement = await this.movementService.create(req.body, req.user!.id);
-      res.status(201).json(movement);
     } catch (error) {
-      if (error instanceof AppError) {
-        res.status(error.statusCode).json({ message: error.message });
-        return;
-      }
-      res.status(500).json({ message: "Error al crear movimiento" });
+      next(error);
     }
   };
 
-  getByProduct = async (req: AuthRequest, res: Response): Promise<void> => {
+  getById = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const movement = await this.movementService.getById(req.params.id as string);
+      res.json(movement);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getByProduct = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const movements = await this.movementService.getByProduct(req.params.productId as string);
       res.json(movements);
-    } catch {
-      res.status(500).json({ message: "Error al obtener movimientos" });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // ─── Creación ─────────────────────────────────────────────────────────────────
+
+  createCompra = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const movement = await this.movementService.createCompra(req.body, req.user!.id);
+      res.status(201).json(movement);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  createBaja = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const movement = await this.movementService.createBaja(req.body, req.user!.id);
+      res.status(201).json(movement);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // ─── Aprobación / rechazo ─────────────────────────────────────────────────────
+
+  approveBaja = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const movement = await this.movementService.approveBaja(
+        req.params.id as string,
+        req.user!.id,
+      );
+      res.json(movement);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  rejectBaja = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const movement = await this.movementService.rejectBaja(
+        req.params.id as string,
+        req.user!.id,
+      );
+      res.json(movement);
+    } catch (error) {
+      next(error);
     }
   };
 }

@@ -37,7 +37,7 @@ export class ProductRepository implements IProductRepository {
   }
 
   async updateStock(id: string, delta: number): Promise<void> {
-    await Product.findByIdAndUpdate(id, { $inc: { minStock: delta } });
+    await Product.findByIdAndUpdate(id, { $inc: { stock: delta } });
   }
 
   async countByCategory(categoryId: string): Promise<number> {

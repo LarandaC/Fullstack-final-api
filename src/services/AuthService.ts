@@ -1,12 +1,26 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { IAuthService, RegisterInput, LoginInput, RegisterResult, LoginResult } from "../interfaces/services/IAuthService";
+import {
+  IAuthService,
+  RegisterInput,
+  LoginInput,
+  RegisterResult,
+  LoginResult,
+} from "../interfaces/services/IAuthService";
 import { IUserRepository } from "../interfaces/repositories/IUserRepository";
 import { AppError } from "../errors/AppError";
 import { ROLES } from "../types/roles";
 
+export interface JwtConfig {
+  secret: string;
+  expiresIn: string;
+}
+
 export class AuthService implements IAuthService {
-  constructor(private readonly userRepository: IUserRepository) {}
+  constructor(
+    private readonly userRepository: IUserRepository,
+    private readonly jwtConfig: JwtConfig,
+  ) {}
 
   async register(data: RegisterInput): Promise<RegisterResult> {
     const existing = await this.userRepository.findByEmail(data.email);
@@ -45,8 +59,8 @@ export class AuthService implements IAuthService {
 
     const token = jwt.sign(
       { id: user._id, role: user.role },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "8h" },
+      this.jwtConfig.secret,
+      { expiresIn: this.jwtConfig.expiresIn as jwt.SignOptions["expiresIn"] },
     );
 
     return {

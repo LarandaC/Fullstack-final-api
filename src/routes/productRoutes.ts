@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { ProductController } from "../controllers/productController";
 import { protect, requireRole } from "../middleware/auth";
-import { productService } from "../container";
+import { productService, productAccessPolicy } from "../container";
 import {
   ROLES,
   MANAGEMENT_ROLES,
@@ -9,7 +9,7 @@ import {
 } from "../types/roles";
 
 const router = Router();
-const controller = new ProductController(productService);
+const controller = new ProductController(productService, productAccessPolicy);
 
 router.get("/", protect, controller.getAll);
 router.get("/:id", protect, controller.getById);

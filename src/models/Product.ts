@@ -15,6 +15,7 @@ export interface IProduct extends Document {
   isWeighable: boolean;
   unit: UnitType;
   iva: number;
+  stock: number;
   minStock: number;
   maxStock: number;
   createdAt: Date;
@@ -34,6 +35,7 @@ const ProductSchema = new Schema<IProduct>(
     isWeighable: { type: Boolean, default: false },
     unit: { type: String, enum: UNIT_VALUES, required: true },
     iva: { type: Number, required: true, min: 0 },
+    stock: { type: Number, default: 0, min: 0 },
     minStock: { type: Number, default: 0, min: 0 },
     maxStock: { type: Number, default: 0, min: 0 },
   },

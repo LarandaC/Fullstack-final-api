@@ -1,17 +1,47 @@
-import { IMovement } from "../../models/Movement";
+import type { IMovement, MovementStatus, BajaReason } from "../../models/Movement";
 
-export interface CreateMovementData {
-  type: "entrada" | "salida";
-  quantity: number;
+// ─── DTOs de escritura ─────────────────────────────────────────────────────────
+
+export interface CreateCompraItemData {
   product: string;
-  user: string;
+  quantity: number;
+  purchasePrice?: number;
+  salePrice?: number;
+}
+
+export interface CreateBajaItemData {
+  product: string;
+  quantity: number;
+  reason: BajaReason;
+  reasonDetail?: string;
+}
+
+export interface CreateCompraData {
+  items: CreateCompraItemData[];
+  notes?: string;
   supplier?: string;
-  reason?: string;
+  createdBy: string;
   date?: Date;
 }
 
+export interface CreateBajaData {
+  items: CreateBajaItemData[];
+  notes?: string;
+  createdBy: string;
+  date?: Date;
+}
+
+// ─── Interfaz ──────────────────────────────────────────────────────────────────
+
 export interface IMovementRepository {
   findAll(): Promise<IMovement[]>;
+  findById(id: string): Promise<IMovement | null>;
   findByProduct(productId: string): Promise<IMovement[]>;
-  create(data: CreateMovementData): Promise<IMovement>;
+  createCompra(data: CreateCompraData): Promise<IMovement>;
+  createBaja(data: CreateBajaData): Promise<IMovement>;
+  updateStatus(
+    id: string,
+    status: MovementStatus,
+    approverId: string,
+  ): Promise<IMovement | null>;
 }

@@ -13,12 +13,21 @@ export const PRICE_ROLES: UserRole[] = [ROLES.ADMIN, ROLES.FINANCIERO];
 /** Roles que pueden gestionar productos y categorías */
 export const MANAGEMENT_ROLES: UserRole[] = [ROLES.ADMIN, ROLES.SUPERVISOR];
 
-/** Roles que pueden registrar movimientos */
+/** Roles que pueden registrar movimientos (legacy, para compatibilidad) */
 export const MOVEMENT_ROLES: UserRole[] = [
   ROLES.ADMIN,
   ROLES.SUPERVISOR,
   ROLES.INVENTARISTA,
 ];
+
+/** Roles que pueden registrar una compra */
+export const COMPRA_ROLES: UserRole[] = [ROLES.ADMIN, ROLES.FINANCIERO];
+
+/** Roles que pueden registrar una baja */
+export const BAJA_ROLES: UserRole[] = [ROLES.ADMIN, ROLES.SUPERVISOR];
+
+/** Roles que pueden aprobar o rechazar una baja */
+export const APPROVAL_ROLES: UserRole[] = [ROLES.ADMIN];
 
 /** Roles que pueden editar un producto (campos no-precio) */
 export const PRODUCT_EDIT_ROLES: UserRole[] = [
