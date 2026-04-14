@@ -5,9 +5,11 @@ import type { IMovementService } from "../interfaces/services/IMovementService";
 export class MovementController {
   constructor(private readonly movementService: IMovementService) {}
 
-  // ─── Consultas ───────────────────────────────────────────────────────────────
-
-  getAll = async (_req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  getAll = async (
+    _req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       const movements = await this.movementService.getAll();
       res.json(movements);
@@ -16,47 +18,73 @@ export class MovementController {
     }
   };
 
-  getById = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  getById = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
-      const movement = await this.movementService.getById(req.params.id as string);
+      const movement = await this.movementService.getById(
+        req.params.id as string,
+      );
       res.json(movement);
     } catch (error) {
       next(error);
     }
   };
 
-  getByProduct = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  getByProduct = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
-      const movements = await this.movementService.getByProduct(req.params.productId as string);
+      const movements = await this.movementService.getByProduct(
+        req.params.productId as string,
+      );
       res.json(movements);
     } catch (error) {
       next(error);
     }
   };
 
-  // ─── Creación ─────────────────────────────────────────────────────────────────
-
-  createCompra = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  createCompra = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
-      const movement = await this.movementService.createCompra(req.body, req.user!.id);
+      const movement = await this.movementService.createCompra(
+        req.body,
+        req.user!.id,
+      );
       res.status(201).json(movement);
     } catch (error) {
       next(error);
     }
   };
 
-  createBaja = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  createBaja = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
-      const movement = await this.movementService.createBaja(req.body, req.user!.id);
+      const movement = await this.movementService.createBaja(
+        req.body,
+        req.user!.id,
+      );
       res.status(201).json(movement);
     } catch (error) {
       next(error);
     }
   };
 
-  // ─── Aprobación / rechazo ─────────────────────────────────────────────────────
-
-  approveBaja = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  approveBaja = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       const movement = await this.movementService.approveBaja(
         req.params.id as string,
@@ -68,7 +96,11 @@ export class MovementController {
     }
   };
 
-  rejectBaja = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  rejectBaja = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       const movement = await this.movementService.rejectBaja(
         req.params.id as string,

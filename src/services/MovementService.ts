@@ -14,8 +14,6 @@ export class MovementService implements IMovementService {
     private readonly stockService: IStockService,
   ) {}
 
-  // ─── Consultas ───────────────────────────────────────────────────────────────
-
   async getAll(): Promise<IMovement[]> {
     return this.movementRepository.findAll();
   }
@@ -29,8 +27,6 @@ export class MovementService implements IMovementService {
   async getByProduct(productId: string): Promise<IMovement[]> {
     return this.movementRepository.findByProduct(productId);
   }
-
-  // ─── Compra ──────────────────────────────────────────────────────────────────
 
   async createCompra(
     data: CreateCompraInput,
@@ -58,12 +54,7 @@ export class MovementService implements IMovementService {
     return movement;
   }
 
-  // ─── Baja ────────────────────────────────────────────────────────────────────
-
-  async createBaja(
-    data: CreateBajaInput,
-    userId: string,
-  ): Promise<IMovement> {
+  async createBaja(data: CreateBajaInput, userId: string): Promise<IMovement> {
     await Promise.all(
       data.items.map((item) =>
         this.stockService.validateSufficientStock(item.product, item.quantity),
@@ -73,8 +64,6 @@ export class MovementService implements IMovementService {
     return this.movementRepository.createBaja({ ...data, createdBy: userId });
   }
 
-  // ─── Aprobación de baja ───────────────────────────────────────────────────────
-
   async approveBaja(id: string, approverId: string): Promise<IMovement> {
     const movement = await this.movementRepository.findById(id);
     if (!movement) throw new AppError("Movimiento no encontrado", 404);
@@ -83,11 +72,18 @@ export class MovementService implements IMovementService {
     if (movement.status !== "pendiente")
       throw new AppError(`El movimiento ya fue ${movement.status}`, 409);
 
-    // Re-validar stock al momento de aprobación (puede haber cambiado)
+    const getProductId = (product: unknown): string => {
+      if (product && typeof product === "object" && "_id" in product) {
+        return String((product as { _id: unknown })._id);
+      }
+      return String(product);
+    };
+
+    // Re-validar stock al momento de aprobación
     await Promise.all(
       movement.items.map((item) =>
         this.stockService.validateSufficientStock(
-          item.product.toString(),
+          getProductId(item.product),
           item.quantity,
         ),
       ),
@@ -95,7 +91,7 @@ export class MovementService implements IMovementService {
 
     await Promise.all(
       movement.items.map((item) =>
-        this.stockService.decrease(item.product.toString(), item.quantity),
+        this.stockService.decrease(getProductId(item.product), item.quantity),
       ),
     );
 
@@ -105,8 +101,6 @@ export class MovementService implements IMovementService {
       approverId,
     ))!;
   }
-
-  // ─── Rechazo de baja ──────────────────────────────────────────────────────────
 
   async rejectBaja(id: string, approverId: string): Promise<IMovement> {
     const movement = await this.movementRepository.findById(id);

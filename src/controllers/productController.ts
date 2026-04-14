@@ -3,6 +3,7 @@ import type { AuthRequest } from "../middleware/auth";
 import { IProductService } from "../interfaces/services/IProductService";
 import { IProductAccessPolicy } from "../interfaces/policies/IProductAccessPolicy";
 import type { UserRole } from "../types/roles";
+import type { CreateProductData } from "../interfaces/repositories/IProductRepository";
 
 export class ProductController {
   constructor(
@@ -22,7 +23,12 @@ export class ProductController {
         Math.max(1, parseInt(req.query.limit as string) || 10),
       );
       const result = await this.productService.getPaginated(page, limit);
-      res.json(this.accessPolicy.filterResponse(result, req.user?.role));
+      res.json(
+        this.accessPolicy.filterResponse(
+          result,
+          req.user?.role as UserRole | undefined,
+        ),
+      );
     } catch (error) {
       next(error);
     }
@@ -34,8 +40,15 @@ export class ProductController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const product = await this.productService.getById(req.params.id);
-      res.json(this.accessPolicy.filterResponse(product, req.user?.role));
+      const product = await this.productService.getById(
+        req.params.id as string,
+      );
+      res.json(
+        this.accessPolicy.filterResponse(
+          product,
+          req.user?.role as UserRole | undefined,
+        ),
+      );
     } catch (error) {
       next(error);
     }
@@ -48,7 +61,10 @@ export class ProductController {
   ): Promise<void> => {
     try {
       const role = req.user?.role as UserRole;
-      const body = this.accessPolicy.filterCreatePayload(req.body, role);
+      const body = this.accessPolicy.filterCreatePayload(
+        req.body,
+        role,
+      ) as unknown as CreateProductData;
       const product = await this.productService.create(body);
       res.status(201).json(this.accessPolicy.filterResponse(product, role));
     } catch (error) {
@@ -63,8 +79,14 @@ export class ProductController {
   ): Promise<void> => {
     try {
       const role = req.user?.role as UserRole;
-      const body = this.accessPolicy.filterUpdatePayload(req.body, role);
-      const product = await this.productService.update(req.params.id, body);
+      const body = this.accessPolicy.filterUpdatePayload(
+        req.body,
+        role,
+      ) as unknown as Partial<CreateProductData>;
+      const product = await this.productService.update(
+        req.params.id as string,
+        body,
+      );
       res.json(this.accessPolicy.filterResponse(product, role));
     } catch (error) {
       next(error);
@@ -77,7 +99,7 @@ export class ProductController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      await this.productService.delete(req.params.id);
+      await this.productService.delete(req.params.id as string);
       res.json({ message: "Producto eliminado correctamente" });
     } catch (error) {
       next(error);

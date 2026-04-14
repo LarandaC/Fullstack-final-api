@@ -37,7 +37,9 @@ export class ProductRepository implements IProductRepository {
   }
 
   async updateStock(id: string, delta: number): Promise<void> {
-    await Product.findByIdAndUpdate(id, { $inc: { stock: delta } });
+    console.log(`[ProductRepository] Updating stock for ${id} with delta ${delta}`);
+    const result = await Product.findByIdAndUpdate(id, { $inc: { stock: delta } }, { new: true });
+    console.log(`[ProductRepository] New stock for ${id}: ${result?.stock}`);
   }
 
   async countByCategory(categoryId: string): Promise<number> {

@@ -33,6 +33,7 @@ export class StockService implements IStockService {
   }
 
   async decrease(productId: string, quantity: number): Promise<void> {
+    console.log(`[StockService] Decreasing stock for ${productId} by ${quantity}`);
     await this.productRepository.updateStock(productId, -quantity);
   }
 
