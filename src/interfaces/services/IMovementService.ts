@@ -1,7 +1,9 @@
 import type { IMovement } from "../../models/Movement";
-import type { CreateCompraItemData, CreateBajaItemData } from "../repositories/IMovementRepository";
-
-// ─── DTOs de entrada (lo que recibe el controller) ────────────────────────────
+import { MovementFilters } from "../../utils/FilterUtils";
+import type {
+  CreateCompraItemData,
+  CreateBajaItemData,
+} from "../repositories/IMovementRepository";
 
 export interface CreateCompraInput {
   items: CreateCompraItemData[];
@@ -16,10 +18,8 @@ export interface CreateBajaInput {
   date?: Date;
 }
 
-// ─── Interfaz ──────────────────────────────────────────────────────────────────
-
 export interface IMovementService {
-  getAll(): Promise<IMovement[]>;
+  getAll(filters?: MovementFilters): Promise<IMovement[]>;
   getById(id: string): Promise<IMovement>;
   getByProduct(productId: string): Promise<IMovement[]>;
   createCompra(data: CreateCompraInput, userId: string): Promise<IMovement>;

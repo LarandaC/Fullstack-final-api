@@ -15,8 +15,13 @@ export interface UpdateUserData {
   role?: UserRole;
 }
 
+export interface UserFilters {
+  role?: string;
+  hasMovements?: boolean;
+}
+
 export interface IUserRepository {
-  findAll(): Promise<IUser[]>;
+  findAll(filters?: UserFilters): Promise<IUser[]>;
   findById(id: string): Promise<IUser | null>;
   findByEmail(email: string): Promise<IUser | null>;
   create(data: CreateUserData): Promise<IUser>;

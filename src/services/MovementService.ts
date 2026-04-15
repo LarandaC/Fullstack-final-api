@@ -7,6 +7,7 @@ import type { IMovementRepository } from "../interfaces/repositories/IMovementRe
 import type { IStockService } from "../interfaces/services/IStockService";
 import type { IMovement } from "../models/Movement";
 import { AppError } from "../errors/AppError";
+import { type MovementFilters } from "../utils/FilterUtils";
 
 export class MovementService implements IMovementService {
   constructor(
@@ -14,8 +15,8 @@ export class MovementService implements IMovementService {
     private readonly stockService: IStockService,
   ) {}
 
-  async getAll(): Promise<IMovement[]> {
-    return this.movementRepository.findAll();
+  async getAll(filters?: MovementFilters): Promise<IMovement[]> {
+    return this.movementRepository.findAll(filters);
   }
 
   async getById(id: string): Promise<IMovement> {

@@ -1,14 +1,27 @@
 import User, { IUser } from "../models/User";
+import Movement from "../models/Movement";
 import {
   IUserRepository,
   CreateUserData,
   UpdateUserData,
+  UserFilters,
 } from "../interfaces/repositories/IUserRepository";
 import type { UserRole } from "../types/roles";
 
 export class UserRepository implements IUserRepository {
-  async findAll(): Promise<IUser[]> {
-    return User.find().select("-password").sort({ createdAt: -1 });
+  async findAll(filters?: UserFilters): Promise<IUser[]> {
+    const query: any = {};
+
+    if (filters?.role && filters.role !== "todos") {
+      query.role = filters.role;
+    }
+
+    if (filters?.hasMovements) {
+      const activeUserIds = await Movement.distinct("createdBy");
+      query._id = { $in: activeUserIds };
+    }
+
+    return User.find(query).select("-password").sort({ createdAt: -1 });
   }
 
   async findById(id: string): Promise<IUser | null> {

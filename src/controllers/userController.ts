@@ -5,9 +5,13 @@ import type { AuthRequest } from "../middleware/auth";
 export class UserController {
   constructor(private readonly userService: IUserService) {}
 
-  getAll = async (_req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  getAll = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const users = await this.userService.getAll();
+      const { role, hasMovements } = req.query;
+      const users = await this.userService.getAll({
+        role: role as string,
+        hasMovements: hasMovements === "true",
+      });
       res.json(users);
     } catch (error) {
       next(error);

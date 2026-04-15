@@ -6,12 +6,19 @@ export class MovementController {
   constructor(private readonly movementService: IMovementService) {}
 
   getAll = async (
-    _req: AuthRequest,
+    req: AuthRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const movements = await this.movementService.getAll();
+      const { type, status, createdBy, startDate, endDate } = req.query;
+      const movements = await this.movementService.getAll({
+        type: type as string,
+        status: status as string,
+        createdBy: createdBy as string,
+        startDate: startDate as string,
+        endDate: endDate as string,
+      });
       res.json(movements);
     } catch (error) {
       next(error);

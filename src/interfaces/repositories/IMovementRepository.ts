@@ -1,6 +1,5 @@
-import type { IMovement, MovementStatus, BajaReason } from "../../models/Movement";
-
-// ─── DTOs de escritura ─────────────────────────────────────────────────────────
+import { BajaReason, IMovement, MovementStatus } from "../../models/Movement";
+import type { MovementFilters } from "../../utils/FilterUtils";
 
 export interface CreateCompraItemData {
   product: string;
@@ -31,10 +30,8 @@ export interface CreateBajaData {
   date?: Date;
 }
 
-// ─── Interfaz ──────────────────────────────────────────────────────────────────
-
 export interface IMovementRepository {
-  findAll(): Promise<IMovement[]>;
+  findAll(filters?: MovementFilters): Promise<IMovement[]>;
   findById(id: string): Promise<IMovement | null>;
   findByProduct(productId: string): Promise<IMovement[]>;
   createCompra(data: CreateCompraData): Promise<IMovement>;

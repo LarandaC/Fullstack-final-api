@@ -4,14 +4,17 @@ import type {
   CreateCompraData,
   CreateBajaData,
 } from "../interfaces/repositories/IMovementRepository";
+import { FilterUtils, type MovementFilters } from "../utils/FilterUtils";
 
 const POPULATE_ITEMS = { path: "items.product", select: "name sku unit" };
 const POPULATE_CREATED_BY = { path: "createdBy", select: "name email" };
 const POPULATE_APPROVED_BY = { path: "approvedBy", select: "name email" };
 
 export class MovementRepository implements IMovementRepository {
-  async findAll(): Promise<IMovement[]> {
-    return Movement.find()
+  async findAll(filters?: MovementFilters): Promise<IMovement[]> {
+    const query = filters ? FilterUtils.buildMovementQuery(filters) : {};
+
+    return Movement.find(query)
       .populate(POPULATE_ITEMS)
       .populate(POPULATE_CREATED_BY)
       .populate(POPULATE_APPROVED_BY)

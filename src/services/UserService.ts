@@ -4,6 +4,7 @@ import type {
   IUserRepository,
   CreateUserData,
   UpdateUserData,
+  UserFilters,
 } from "../interfaces/repositories/IUserRepository";
 import type { IUser } from "../models/User";
 import { AppError } from "../errors/AppError";
@@ -12,8 +13,8 @@ import { ROLES } from "../types/roles";
 export class UserService implements IUserService {
   constructor(private readonly userRepository: IUserRepository) {}
 
-  async getAll(): Promise<IUser[]> {
-    return this.userRepository.findAll();
+  async getAll(filters?: UserFilters): Promise<IUser[]> {
+    return this.userRepository.findAll(filters);
   }
 
   async getById(id: string): Promise<IUser> {
