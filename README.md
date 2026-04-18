@@ -25,14 +25,23 @@ npm install
 
 ## Variables de entorno
 
-Crear un archivo `.env` en la raíz:
+Crear un archivo `.env` en la raíz (ver `.env.example`):
 
 ```env
 PORT=3000
-MONGO_URI=mongodb+srv://<usuario>:<password>@<cluster>.mongodb.net/<db>
+MONGO_URI=mongodb+srv://<usuario>:<password>@<cluster>.mongodb.net/<db>?appName=<app>
 JWT_SECRET=tu_clave_secreta_segura
 JWT_EXPIRES_IN=8h          # opcional, default: 8h
 ```
+
+| Variable | Descripción | Requerida |
+|---|---|---|
+| `PORT` | Puerto del servidor | No (default: 3000) |
+| `MONGO_URI` | URI de conexión a MongoDB Atlas | Sí |
+| `JWT_SECRET` | Clave para firmar tokens JWT | Sí |
+| `JWT_EXPIRES_IN` | Duración del token | No (default: 8h) |
+
+> **MongoDB Atlas:** la IP desde donde corre el servidor debe estar en la whitelist del cluster (Security → Network Access). Para Railway u otros servicios con IP dinámica, usar `0.0.0.0/0`.
 
 ## Scripts
 
@@ -41,6 +50,8 @@ npm run dev      # Desarrollo con hot-reload (nodemon + ts-node)
 npm run build    # Compilar TypeScript a /dist
 npm start        # Producción (requiere build previo)
 ```
+
+> El servidor espera a que MongoDB conecte antes de empezar a escuchar. Si la conexión falla, el proceso termina con un error claro.
 
 ## Arquitectura
 
@@ -89,10 +100,11 @@ POST /api/auth/register    Registrar usuario
 POST /api/auth/login       Iniciar sesión → devuelve JWT
 ```
 
-### Usuarios *(admin)*
+### Usuarios *(solo admin)*
 
 ```
 GET    /api/users          Listar usuarios
+GET    /api/users/:id      Detalle de usuario
 POST   /api/users          Crear usuario
 PUT    /api/users/:id      Editar usuario
 DELETE /api/users/:id      Eliminar usuario
@@ -122,7 +134,7 @@ DELETE /api/categories/:id      Eliminar categoría       (admin)
 ### Movimientos *(autenticado)*
 
 ```
-GET    /api/movements                  Listar movimientos
+GET    /api/movements                  Listar movimientos (soporta filtros)
 GET    /api/movements/:id              Detalle de movimiento
 GET    /api/movements/product/:id      Movimientos por producto
 
@@ -132,6 +144,16 @@ POST   /api/movements/baja             Registrar baja        (admin, supervisor)
 PATCH  /api/movements/:id/approve      Aprobar baja          (admin)
 PATCH  /api/movements/:id/reject       Rechazar baja         (admin)
 ```
+
+**Filtros disponibles en `GET /api/movements`:**
+
+| Query param | Descripción | Ejemplo |
+|---|---|---|
+| `type` | Tipo de movimiento (`compra` / `baja`) | `?type=compra` |
+| `status` | Estado (`pendiente` / `aprobado` / `rechazado`) | `?status=pendiente` |
+| `createdBy` | ID del usuario creador | `?createdBy=abc123` |
+| `startDate` | Fecha desde (ISO 8601) | `?startDate=2025-01-01` |
+| `endDate` | Fecha hasta (ISO 8601) | `?endDate=2025-12-31` |
 
 ## Roles y permisos
 
@@ -161,3 +183,20 @@ El stock se actualiza **inmediatamente** al registrar la compra. Opcionalmente a
 Baja creada → pendiente → aprobado  (stock descontado)
                        → rechazado  (sin cambios)
 ```
+
+## Manejo de errores
+
+Todos los errores devuelven JSON con la siguiente forma:
+
+```json
+{ "message": "Descripción del error" }
+```
+
+| Código | Causa |
+|---|---|
+| 400 | Datos inválidos o faltantes |
+| 401 | Token ausente, inválido o expirado |
+| 403 | Rol sin permisos para la operación |
+| 404 | Recurso no encontrado |
+| 409 | Conflicto (ej: email ya registrado, stock insuficiente) |
+| 500 | Error interno del servidor |
